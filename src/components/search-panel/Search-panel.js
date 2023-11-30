@@ -1,9 +1,12 @@
+import './Search-panel.css'
 
 const SearchPanel = () => {
   return (
-    <div>
-      SearchPanel
-    </div>
+    <input
+      type="text"
+      className="form-control search-input"
+      placeholder="Kinolarni qidirish"
+    />
   )
 }
 
