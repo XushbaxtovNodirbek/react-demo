@@ -16,7 +16,8 @@ class App extends Component {
                 {id: 1, title: 'Rick and Jany', countViewes: 89,favorite: false, like: false},
                 {id: 2, title: 'Wednesday', countViewes: 777,favorite: false, like: false},
                 {id: 3, title: 'Sweet Home', countViewes: 99,favorite: false, like: false},
-            ]
+            ],
+            term: ''
         }
     }
 
@@ -48,7 +49,7 @@ class App extends Component {
     //         return item
     //     })}))
     // }
-
+    // TOGGLE FUNCTION
     onToggle = (id,prop) => {
         this.setState(({data}) => ({data : data.map(item =>{
             if(item.id === id){
@@ -57,13 +58,23 @@ class App extends Component {
             return item
         })}))
     }
-
+    // DELETE FUNCTION
     onDelete = (id) => {
         this.setState(({data}) => ({data:data.filter(item => item.id !== id)}))
     }
+
+    searchMovies = ( arr, term ) => {
+        if(term.length === 0){
+            return arr
+        }
+        return arr.filter(item => item.title.toLowerCase().indexOf(term.toLowerCase())> -1)
+    }
+
+    updateTerm = (term) => this.setState({term})
     
     render(){
-        const {data} = this.state
+        const {data, term} = this.state
+        const visibleItems = this.searchMovies(data,term)
         return (
             <div className='App font-monospace'>
                 <div className='content'>
@@ -73,13 +84,13 @@ class App extends Component {
                       likestMovies={this.state.data.filter(item => item.like).length}
                     />
                     <div className="search-panel">
-                        <SearchPanel/>
+                        <SearchPanel updateTerm={this.updateTerm}/>
                         <AppFilter/>
                     </div>
                     <MovieList 
                     onDelete={this.onDelete}
                     onToggle={this.onToggle}
-                    data={data}/>
+                    data={visibleItems}/>
                     <MovieAddForm addMovie = {this.addMovie}/>
                 </div>
             </div>
