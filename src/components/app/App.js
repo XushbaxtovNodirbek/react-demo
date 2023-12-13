@@ -1,5 +1,5 @@
 import "./App.css";
-import { Component } from "react";
+import { Component, useState } from "react";
 import AppInfo from "../app-info/App-info";
 import AppFilter from "../app-filter/App-filter";
 import SearchPanel from "../search-panel/Search-panel";
@@ -8,7 +8,80 @@ import MovieAddForm from "../movies-add-form/Movie-add-form";
 import {v4 as uuidv4} from 'uuid' // uuid paketini import qilamiz
 
 
-class App extends Component {
+const App = () => {
+    const [filter,setFilter] = useState('all'),
+    [term,setTerm] = useState(''),
+    [data,setData] = useState(
+        [
+            {id: 1, title: 'Rick and Jany', countViewes: 89,favorite: false, like: false},
+            {id: 2, title: 'Wednesday', countViewes: 777,favorite: false, like: false},
+            {id: 3, title: 'Sweet Home', countViewes: 99,favorite: false, like: false},
+        ]
+    ) 
+
+    const addMovie = (item) => {
+        const newItem = {...item,id:uuidv4(),favorite:false,like:false}
+        setData(data => [...data,newItem])
+    }
+
+    const onDelete = (id) => {
+        setData(data => data.filter(item => item.id !== id))
+    } 
+
+    const onToggle = (id,prop) => {
+        setData(data => data.map(item => {
+            if(item.id === id){
+                return {...item,[prop]:!item[prop]}
+            }
+            return item
+        }))
+    }
+
+    const searchMovies = ( arr, term ) => {
+        if(term.length === 0){
+            return arr
+        }
+        return arr.filter(item => item.title.toLowerCase().indexOf(term.toLowerCase())> -1)
+    }
+
+    const filterMovies = (arr,filter) => {
+        switch(filter){
+            case 'favorite': {return arr.filter(item => item.like)}
+            case 'popular': {return arr.sort((a,b) => b.countViewes - a.countViewes)}
+            default: return arr
+        }
+    }
+
+    const updateTerm = (term) => setTerm(term)
+    const updateFilter = (filter) => setFilter(filter)
+
+    const visibleItems = filterMovies(searchMovies(data,term),filter)
+
+    return (
+        <div className="App font-monospace">
+            <div className="content">
+                <AppInfo
+                  allMovies={data.length}
+                  favoriteMovies={data.filter(item => item.favorite).length}
+                  likestMovies={data.filter(item => item.like).length}
+                />
+                <div className="search-panel">
+                    <SearchPanel updateTerm={updateTerm}/>
+                    <AppFilter updateFilter={updateFilter}/>
+                </div>
+                <MovieList
+                  onDelete={onDelete}
+                  onToggle={onToggle}
+                  data={visibleItems}
+                />
+                <MovieAddForm addMovie={addMovie}/>
+            </div>
+        </div>
+    )
+
+}
+
+class App1 extends Component {
     constructor(props){
         super(props)
         this.state={
@@ -17,10 +90,10 @@ class App extends Component {
                 {id: 2, title: 'Wednesday', countViewes: 777,favorite: false, like: false},
                 {id: 3, title: 'Sweet Home', countViewes: 99,favorite: false, like: false},
             ],
-            term: ''
+            term: '',
+            filter: 'all'
         }
     }
-
     addMovie = (item) => {
         // e.preventDefault();
         // this.setState(({data}) => {
@@ -30,7 +103,6 @@ class App extends Component {
         const newItem = {...item,id:uuidv4(),favorite:false,like:false}
         this.setState(({data}) => ({data:[...data,newItem]}))
     }
-
     // onLike = (id) => {
     //     console.log(id);
     //     this.setState(({data}) => ({data : data.map(item =>{
@@ -62,19 +134,25 @@ class App extends Component {
     onDelete = (id) => {
         this.setState(({data}) => ({data:data.filter(item => item.id !== id)}))
     }
-
     searchMovies = ( arr, term ) => {
         if(term.length === 0){
             return arr
         }
         return arr.filter(item => item.title.toLowerCase().indexOf(term.toLowerCase())> -1)
     }
-
     updateTerm = (term) => this.setState({term})
+    updateFilter = (filter) => this.setState({filter})
+    filterMovies = (arr,filter) => {
+        switch(filter){
+            case 'favorite': {return arr.filter(item => item.like)}
+            case 'popular': {return arr.sort((a,b) => b.countViewes - a.countViewes)}
+            default: return arr
+        }
+    }
     
     render(){
-        const {data, term} = this.state
-        const visibleItems = this.searchMovies(data,term)
+        const {data, term,filter} = this.state
+        const visibleItems = this.filterMovies(this.searchMovies(data,term),filter)
         return (
             <div className='App font-monospace'>
                 <div className='content'>
@@ -85,7 +163,7 @@ class App extends Component {
                     />
                     <div className="search-panel">
                         <SearchPanel updateTerm={this.updateTerm}/>
-                        <AppFilter/>
+                        <AppFilter filter={filter} updateFilter={this.updateFilter} />
                     </div>
                     <MovieList 
                     onDelete={this.onDelete}

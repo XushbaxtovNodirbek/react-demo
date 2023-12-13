@@ -3,7 +3,7 @@ import './Movie-list-item.css'
 const MovielistItem = (props) => {
 
   
-    const {movieTitle, countViewes, onDelete , favorite , like ,onToggle} = props;
+    const {movieTitle, countViewes, onDelete , favorite , like ,onToggle} =  props;
 
     return (
       <li className={`list-group-item d-flex justify-contenet-between ${favorite && 'favorite'} ${like && 'like'}`}>

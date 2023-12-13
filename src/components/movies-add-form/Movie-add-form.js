@@ -1,9 +1,9 @@
-import { Component } from 'react' // reactdan Component classini import qilamiz
+import { Component, useState } from 'react' // reactdan Component classini import qilamiz
 
 import './Movie-add-form.css' // MovieAddForm componentimiz uchun css faylimizni import qilamiz 
 
 // MovieAddForm class componenti yaratamiz
-class MovieAddForm extends Component {
+class MovieAddForm1 extends Component {
   constructor(props){
     super(props)
     this.state = { // state ichida inputlarga tegishli qiymatlar bo'ladi
@@ -52,6 +52,51 @@ class MovieAddForm extends Component {
       </div>
     )
   }
+}
+
+const MovieAddForm = ({addMovie}) => {
+  const [title,setTitle] = useState('')
+  const [countViewes,setCountViewes] = useState('')
+
+  const ChangeHandler = (e) =>{
+    if(e.target.name === 'title'){
+      setTitle(e.target.value)
+    }else if(e.target.name === 'countViewes'){
+      setCountViewes(e.target.value)
+    }
+  }
+
+  const addMovieHandler = e => {
+    e.preventDefault()
+    if(title && countViewes){
+      addMovie({title,countViewes})
+      setTitle('')
+      setCountViewes('')
+    }else{
+      alert('Iltimos, barcha maydonlarni to\'ldiring!')
+    }
+  }
+
+
+  return (
+    <div className='movies-add-form'>
+        <h3>Yangi kino qo'shish</h3>
+        <form className='add-form d-flex' onSubmit={addMovieHandler}>
+            {/* new movie title */}
+            <input 
+            value={title} onChange={ChangeHandler} 
+            name='title' type='text' className='form-control new-post-label' 
+            placeholder='Qanday kino?'/>
+            {/* new movie ko'rishlar soni */}
+            <input value={countViewes} name='countViewes'
+            onChange={ChangeHandler} type='number' 
+            className='form-control new-post-label' placeholder="Necha marotaba ko'rilgan?"/>
+            <button type='submit' className='btn btn-outline-dark'>
+                Qo'shish
+            </button>
+        </form>
+      </div>
+  )
 }
 
 export default MovieAddForm
